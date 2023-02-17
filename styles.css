@@ -149,7 +149,7 @@ hr.line {
   display: flex;
   justify-content: space-between;
   width: 45%;
-  border: 1px solid var(--color-gray);
+  border: 1px solid var(--color-primary-light);
   border-radius: 5px;
   padding: .6em .8em;
   margin: 0 .3em 1em;
@@ -158,7 +158,8 @@ hr.line {
   cursor: pointer;
 }
 /* media (responsiveness) */
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 600px) {
+  
   header img {
     display: none;
   }
