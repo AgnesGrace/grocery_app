@@ -6,7 +6,7 @@ const itemList = document.querySelector("#item-list");
 const clearList = document.querySelector("#clear-list");
 const filter = document.querySelector(".filter");
 
-groceryForm.addEventListener("submit", (e) => {
+const formData = (e) => {
   //stop form default behaviour-auto submitting the file
   e.preventDefault();
   const newItem = itemInput.value;
@@ -16,11 +16,31 @@ groceryForm.addEventListener("submit", (e) => {
     warning.style.display = "block";
     return; //because we dont want any further action
   }
+  addGroceryItemToDOM(newItem, newAmount);
+  addGroceryItemToLocalS(newItem);
+  //check function defined below
+  checkUiState();
+  itemInput.value = "";
+  amountInput.value = "";
+};
+
+const createBtn = (classes) => {
+  const button = document.createElement("button");
+  button.className = classes;
+  return button;
+};
+const createIcon = (classes) => {
+  const icon = document.createElement("i");
+  icon.className = classes;
+  return icon;
+};
+//adding groceryItem from the formdata to DOM
+const addGroceryItemToDOM = (item, amount) => {
   //creating list item
   const li = document.createElement("li");
   const p = document.createElement("p");
-  li.appendChild(document.createTextNode(newItem));
-  p.appendChild(document.createTextNode(newAmount));
+  li.appendChild(document.createTextNode(item));
+  p.appendChild(document.createTextNode(amount));
   li.appendChild(p);
   const btn = createBtn("remove-item btn-link text-red");
   const iconBtn = createIcon("fa-solid fa-xmark");
@@ -32,21 +52,6 @@ groceryForm.addEventListener("submit", (e) => {
   li.append(btn);
   //add the list to the dom
   itemList.appendChild(li);
-  //check function defined below
-  checkUiState();
-  itemInput.value = "";
-  amountInput.value = "";
-});
-
-const createBtn = (classes) => {
-  const button = document.createElement("button");
-  button.className = classes;
-  return button;
-};
-const createIcon = (classes) => {
-  const icon = document.createElement("i");
-  icon.className = classes;
-  return icon;
 };
 // cross out the
 // checkInput.addEventListener("change", (e) => {
@@ -111,10 +116,43 @@ const clearAllItems = () => {
     checkUiState();
   }
 };
+
+//localstorage
+const addGroceryItemToLocalS = (item) => {
+  let groceryItemFromStorage = getGroceryItemToLocalS();
+
+  //now add new item to the array
+  groceryItemFromStorage.push(item);
+
+  //back to string and store in localstorage
+  localStorage.setItem("items", JSON.stringify(groceryItemFromStorage));
+};
+//this function gets grocery items in the localstorage
+const getGroceryItemToLocalS = () => {
+  let groceryItemFromStorage;
+  //first check to see if there are items in the storage or not
+  if (localStorage.getItem("items") === null) {
+    groceryItemFromStorage = [];
+  } else {
+    groceryItemFromStorage = JSON.parse(localStorage.getItem("items"));
+  }
+  return groceryItemFromStorage;
+};
+
+const displayGroceryItems = () => {
+  const groceryItemsFromStorage = getGroceryItemToLocalS();
+  groceryItemsFromStorage.forEach((item) =>
+    addGroceryItemToDOM(item, "current")
+  );
+  checkUiState();
+};
+//what happens if i add the same item multiple times? next task
+
 checkUiState();
+groceryForm.addEventListener("submit", formData);
 itemList.addEventListener("click", ischecked);
 itemList.addEventListener("click", removeItem);
 filter.addEventListener("input", filterAllItems);
-clearList.addEventListener("click", clearAllItems);
-
+document.addEventListener("DOMContentLoaded", displayGroceryItems);
 //clear the whole list
+clearList.addEventListener("click", clearAllItems);
