@@ -8,3 +8,5 @@ Try this simple app for free and get everything you want from the shop without t
 Shop conveniently!!!
 
 https://agnesgrace.github.io/grocery_app/
+
+The corrected version will be released soon
