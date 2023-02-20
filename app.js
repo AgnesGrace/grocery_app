@@ -1,41 +1,57 @@
 const groceryForm = document.querySelector("#item-form");
-const itemInput = document.querySelector("#item-input");
-const amountInput = document.querySelector("#amount-input");
 const warning = document.querySelector(".warning");
 const itemList = document.querySelector("#item-list");
 const clearList = document.querySelector("#clear-list");
 const filter = document.querySelector(".filter");
 
+const items = getGroceryItemToLocalS();
+renderItems()
+
 const formData = (e) => {
   //stop form default behaviour-auto submitting the file
   e.preventDefault();
-  const newItem = itemInput.value;
-  const newAmount = amountInput.value;
+  const form = e.target;
+  const newItem = form.name.value;
+  const newAmount = form.amount.value;
   //validation
   if (newItem === "" || newAmount === "") {
     warning.style.display = "block";
     return; //because we dont want any further action
   }
-  addGroceryItemToDOM(newItem, newAmount);
-  addGroceryItemToLocalS(newItem);
+  // addGroceryItemToDOM(newItem, newAmount);
+  // addGroceryItemToLocalS(newItem);
+  items.push({
+    name: newItem,
+    amount: newAmount,
+  })
+
+  renderItems()
+
   //check function defined below
   checkUiState();
-  itemInput.value = "";
-  amountInput.value = "";
+  form.reset()
 };
 
-const createBtn = (classes) => {
+function renderItems(){
+  itemList.innerHTML = ''
+  items.forEach(item => {    
+    itemList.appendChild(createItemLI(item.name, item.amount))
+  }).join('')
+}
+
+
+function createBtn (classes) {
   const button = document.createElement("button");
   button.className = classes;
   return button;
 };
-const createIcon = (classes) => {
+function createIcon (classes) {
   const icon = document.createElement("i");
   icon.className = classes;
   return icon;
 };
 //adding groceryItem from the formdata to DOM
-const addGroceryItemToDOM = (item, amount) => {
+function createItemLI (item, amount) {
   //creating list item
   const li = document.createElement("li");
   const p = document.createElement("p");
@@ -51,7 +67,7 @@ const addGroceryItemToDOM = (item, amount) => {
   btn.appendChild(iconBtn);
   li.append(btn);
   //add the list to the dom
-  itemList.appendChild(li);
+  return li
 };
 // cross out the
 // checkInput.addEventListener("change", (e) => {
@@ -118,28 +134,22 @@ const clearAllItems = () => {
 };
 
 //localstorage
-const addGroceryItemToLocalS = (item) => {
-  let groceryItemFromStorage = getGroceryItemToLocalS();
-
-  //now add new item to the array
-  groceryItemFromStorage.push(item);
-
-  //back to string and store in localstorage
-  localStorage.setItem("items", JSON.stringify(groceryItemFromStorage));
+function addGroceryItemToLocalS (item) {
+  localStorage.setItem("items", JSON.stringify(items));
 };
 //this function gets grocery items in the localstorage
-const getGroceryItemToLocalS = () => {
+function getGroceryItemToLocalS () {
   let groceryItemFromStorage;
   //first check to see if there are items in the storage or not
   if (localStorage.getItem("items") === null) {
-    groceryItemFromStorage = [];
+    groceryItemFromStorage = [] ;
   } else {
     groceryItemFromStorage = JSON.parse(localStorage.getItem("items"));
   }
   return groceryItemFromStorage;
 };
 
-const displayGroceryItems = () => {
+function displayGroceryItems () {
   const groceryItemsFromStorage = getGroceryItemToLocalS();
   groceryItemsFromStorage.forEach((item) =>
     addGroceryItemToDOM(item, "current")
@@ -153,6 +163,6 @@ groceryForm.addEventListener("submit", formData);
 itemList.addEventListener("click", ischecked);
 itemList.addEventListener("click", removeItem);
 filter.addEventListener("input", filterAllItems);
-document.addEventListener("DOMContentLoaded", displayGroceryItems);
+document.addEventListener("DOMContentLoaded", renderItems);
 //clear the whole list
 clearList.addEventListener("click", clearAllItems);
